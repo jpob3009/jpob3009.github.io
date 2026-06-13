@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Powerwall Dashboard — Authorisation</title>
+  <style>
+    body { font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+           max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+    h1 { font-size: 1.4rem; }
+    .ok { color: #137333; }
+    .err { color: #b00020; }
+    textarea { width: 100%; height: 90px; font-family: monospace; font-size: 13px;
+               padding: 10px; box-sizing: border-box; margin-top: 8px; }
+    button { margin-top: 10px; padding: 10px 16px; font-size: 15px; cursor: pointer;
+             border: 0; border-radius: 6px; background: #1a73e8; color: #fff; }
+    .muted { color: #666; font-size: 0.9rem; }
+    code { background:#f1f1f1; padding:1px 4px; border-radius:3px; }
+  </style>
+</head>
+<body>
+  <h1 id="title">Processing…</h1>
+  <p id="msg" class="muted"></p>
+  <textarea id="code" readonly placeholder="(the code will appear here)"></textarea>
+  <br>
+  <button id="copy" type="button">Copy code</button>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get('code');
+      var error = params.get('error');
+      var title = document.getElementById('title');
+      var msg = document.getElementById('msg');
+      var box = document.getElementById('code');
+
+      if (code) {
+        title.textContent = '✅ Authorisation complete';
+        title.className = 'ok';
+        msg.innerHTML = 'Copy the code below and paste it back into your chat. ' +
+                        'It is single-use and expires in a few minutes.';
+        box.value = code;
+        box.focus(); box.select();
+      } else if (error) {
+        title.textContent = '⚠️ Authorisation failed';
+        title.className = 'err';
+        msg.textContent = 'Tesla returned: ' + error + ' — ' +
+                          (params.get('error_description') || '');
+      } else {
+        title.textContent = 'Nothing to show';
+        msg.textContent = 'Open this page by completing the Tesla sign-in link.';
+      }
+
+      document.getElementById('copy').addEventListener('click', function () {
+        box.select();
+        document.execCommand('copy');
+        this.textContent = 'Copied ✓';
+      });
+    })();
+  </script>
+</body>
+</html>
